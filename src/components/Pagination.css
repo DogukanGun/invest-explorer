@@ -1,0 +1,11 @@
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; flex-wrap: wrap; gap: 12px; }
+.pg-info { color: #64748b; font-size: 13px; }
+.pg-controls { display: flex; gap: 4px; }
+.pg-controls button {
+  background: #1a1a2e; border: 1px solid #2a2a40; color: #94a3b8;
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.1s;
+}
+.pg-controls button:hover:not(:disabled) { background: #2a2a40; color: #e2e8f0; }
+.pg-controls button.active { background: #1e3a5f; border-color: #3b82f6; color: #60a5fa; }
+.pg-controls button:disabled { opacity: 0.3; cursor: default; }
+.pg-ellipsis { color: #475569; display: flex; align-items: center; padding: 0 4px; }
