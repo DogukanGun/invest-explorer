@@ -3,7 +3,6 @@ import Pagination from './Pagination'
 import './Table.css'
 
 const STATUS_COLORS = { open: '#10b981', forecast: '#f59e0b', closed: '#ef4444', unknown: '#64748b' }
-const TYPES = ['all', 'sbir', 'sttr', 'nsf', 'nih', 'other']
 
 function fmt(val) {
   if (!val) return null
@@ -12,29 +11,65 @@ function fmt(val) {
   return '$' + val
 }
 
+// Top grant agencies by volume
+const TOP_AGENCIES = [
+  'National Institutes of Health',
+  'Dept. of the Army -- USAMRAA',
+  'Substance Abuse and Mental Health Services Admin',
+  'Health Resources and Services Administration',
+  'National Institute of Food and Agriculture',
+  'Department of Housing and Urban Development',
+  'National Park Service',
+  'Employment and Training Administration',
+  'Bureau Of Educational and Cultural Affairs',
+  'Administration for Children and Families - ORR',
+]
+
 function filterFn(row, q, filters) {
   if (filters.type && filters.type !== 'all' && row.grant_type !== filters.type) return false
   if (filters.status && filters.status !== 'all' && row.status !== filters.status) return false
+  if (filters.agency && row.agency !== filters.agency) return false
   if (!q) return true
-  return (row.program_name || '').toLowerCase().includes(q) ||
+  return (
+    (row.program_name || '').toLowerCase().includes(q) ||
     (row.agency || '').toLowerCase().includes(q) ||
     (row.grant_type || '').toLowerCase().includes(q)
+  )
 }
 
 export default function GrantTable({ data }) {
-  const { search, onSearch, filters, onFilter, paged, filtered, page, setPage, totalPages } = useTable(data, filterFn)
+  const { search, onSearch, filters, onFilter, paged, filtered, page, setPage, totalPages } =
+    useTable(data, filterFn)
 
   return (
     <div>
       <div className="toolbar">
-        <input className="search" placeholder="Search grants…" value={search} onChange={e => onSearch(e.target.value)} />
-        <select className="filter-select" value={filters.type || 'all'} onChange={e => onFilter('type', e.target.value)}>
-          {TYPES.map(t => <option key={t} value={t}>{t === 'all' ? 'All types' : t.toUpperCase()}</option>)}
-        </select>
+        <input
+          className="search"
+          placeholder="Search by program, agency, type…"
+          value={search}
+          onChange={e => onSearch(e.target.value)}
+        />
         <select className="filter-select" value={filters.status || 'all'} onChange={e => onFilter('status', e.target.value)}>
-          {['all', 'open', 'forecast', 'closed'].map(s => <option key={s} value={s}>{s === 'all' ? 'All statuses' : s}</option>)}
+          <option value="all">All statuses</option>
+          <option value="open">Open</option>
+          <option value="forecast">Forecast</option>
+          <option value="closed">Closed</option>
+        </select>
+        <select className="filter-select" value={filters.type || 'all'} onChange={e => onFilter('type', e.target.value)}>
+          <option value="all">All types</option>
+          <option value="nih">NIH</option>
+          <option value="nsf">NSF</option>
+          <option value="sbir">SBIR</option>
+          <option value="sttr">STTR</option>
+          <option value="other">Other</option>
+        </select>
+        <select className="filter-select" value={filters.agency || ''} onChange={e => onFilter('agency', e.target.value)}>
+          <option value="">All agencies</option>
+          {TOP_AGENCIES.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
+
       <div className="table-container">
         <table>
           <thead>
@@ -63,9 +98,9 @@ export default function GrantTable({ data }) {
                   </span>
                 </td>
                 <td className="mono small">
-                  {fmt(row.amount_min_usd) && fmt(row.amount_max_usd)
-                    ? `${fmt(row.amount_min_usd)} – ${fmt(row.amount_max_usd)}`
-                    : fmt(row.amount_min_usd) || fmt(row.amount_max_usd) || '—'}
+                  {fmt(row.amount_min_usd) || fmt(row.amount_max_usd)
+                    ? `${fmt(row.amount_min_usd) || '?'} – ${fmt(row.amount_max_usd) || '?'}`
+                    : '—'}
                 </td>
                 <td className="muted small">{row.deadline || '—'}</td>
               </tr>

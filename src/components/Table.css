@@ -32,3 +32,7 @@ tr:hover td { background: #13131f; }
   display: inline-block; background: #1e1e2e; color: #94a3b8;
   padding: 2px 8px; border-radius: 6px; font-size: 12px; font-family: monospace;
 }
+.tag {
+  display: inline-block; background: #1e2a3a; color: #7dd3fc;
+  padding: 1px 7px; border-radius: 4px; font-size: 11px; margin: 1px 2px 1px 0;
+}
